@@ -5,14 +5,17 @@
 class BasePrimes
 {
 public:
-	BasePrimes(int maxValue);
+	BasePrimes(int minValue, int maxValue);
 	~BasePrimes();
 	void getPrimesToCheck();
-    bool isPrime(int number);
+	int* get() { return primes; };
+	int length() { return primesCount; };
 private:
 	int* primes;
-	int* primesSquares;
+	int* primesToFilter;
+	int* newPrimesToFilter;
 	int primesCount = 0;
 	int maxPrimesCount;
+	int maxPrimeSqrt;
 };
 

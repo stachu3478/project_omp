@@ -3,8 +3,8 @@
 #include "BasePrimes.h"
 
 const int MIN = 2;
-const int MAX = 200000000;
-char result[MAX - MIN];
+const int MAX = 100000000;
+char result[MAX - MIN]{ true };
 
 void printResult() {
     int primeCount = 0;
@@ -19,17 +19,20 @@ void printResult() {
 
 int main()
 {
-    //double start, stop;
-    //start = omp_get_wtime();
-    BasePrimes basePrimes(MAX);
+    double start, stop;
+    start = omp_get_wtime();
+    BasePrimes basePrimes(MIN, MAX);
     //omp_set_num_threads(12);
-    basePrimes.getPrimesToCheck();
+    //basePrimes.getPrimesToCheck();
 //#pragma omp parallel for
-    for (int i = 0; i < MAX - MIN; i++) {
-        result[i] = basePrimes.isPrime(i + MIN);
-    }
-    //stop = omp_get_wtime();
-    //printf("Czas przetwarzania wynosi %f sekund\n", stop - start);
+    basePrimes.getPrimesToCheck();
+    //int* primes = basePrimes.get();
+    //for (int i = 0; i < basePrimes.length(); i++) {
+    //    printf("%d, ", primes[i]);
+    //}
+    stop = omp_get_wtime();
+    printf("\nPrime count: %d\n", basePrimes.length());
+    printf("Czas przetwarzania wynosi %f sekund\n", stop - start);
     //printResult();
     return 0;
 }
