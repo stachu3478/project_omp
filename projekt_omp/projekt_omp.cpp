@@ -1,12 +1,9 @@
-// projekt_omp.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
-
 #include <omp.h>
 #include <stdio.h>
-#include <cmath>
+#include "BasePrimes.h"
 
 const int MIN = 2;
-const int MAX = 50000000;
+const int MAX = 200000000;
 char result[MAX - MIN];
 
 void printResult() {
@@ -14,8 +11,8 @@ void printResult() {
     for (int i = 0, j = MIN; j < MAX; i++, j++) {
         if (!result[i]) continue;
         // if (++primeCount > 100) continue;
-        if (++primeCount % 10 == 0) printf("\n");
-        printf("%d ", j);
+        /*if (*/++primeCount; /*% 10 == 0) printf("\n");*/
+        //printf("%d ", j);
     }
     printf("\nPrime count: %d\n", primeCount);
 }
@@ -24,17 +21,12 @@ int main()
 {
     //double start, stop;
     //start = omp_get_wtime();
+    BasePrimes basePrimes(MAX);
     //omp_set_num_threads(12);
-    //#pragma omp parallel for
+    basePrimes.getPrimesToCheck();
+//#pragma omp parallel for
     for (int i = 0; i < MAX - MIN; i++) {
-        result[i] = true;
-        int j = i + MIN;
-        for (int d = 2; d <= sqrt(j); d++) {
-            if (j % d == 0) {
-                result[i] = false;
-                break;
-            }
-        }
+        result[i] = basePrimes.isPrime(i + MIN);
     }
     //stop = omp_get_wtime();
     //printf("Czas przetwarzania wynosi %f sekund\n", stop - start);
