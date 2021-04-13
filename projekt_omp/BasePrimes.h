@@ -1,6 +1,9 @@
 #pragma once
 
 #include <cmath>
+#include <algorithm>    // std::max
+
+
 
 class BasePrimes
 {
@@ -8,14 +11,12 @@ public:
 	BasePrimes(int minValue, int maxValue);
 	~BasePrimes();
 	void getPrimesToCheck();
-	int* get() { return primes; };
-	int length() { return primesCount; };
+	char* get() { return primesToFilter + minValue; };
 private:
-	int* primes;
-	int* primesToFilter;
-	int* newPrimesToFilter;
+	char* primesToFilter;
 	int primesCount = 0;
-	int maxPrimesCount;
 	int maxPrimeSqrt;
+	int minValue;
+	int maxValue;
 };
 
