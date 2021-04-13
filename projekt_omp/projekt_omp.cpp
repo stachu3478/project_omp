@@ -3,7 +3,7 @@
 #include "BasePrimes.h"
 
 const int MIN = 2;
-const int MAX = 100000000;
+const int MAX = 200000000;
 char result[MAX - MIN]{ true };
 
 void printResult() {

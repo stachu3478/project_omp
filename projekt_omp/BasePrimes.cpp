@@ -2,12 +2,22 @@
 
 BasePrimes::BasePrimes(int minValue, int maxValue) {
     maxPrimeSqrt = sqrt(maxValue);
-    maxPrimesCount = maxValue - minValue;
+    maxPrimesCount = (maxValue - minValue) / 3;
     primes = new int[maxPrimesCount];
     primesToFilter = new int[maxPrimesCount];
     newPrimesToFilter = new int[maxPrimesCount];
-    for (int i = 0; i < maxPrimesCount; i++) primesToFilter[i] = i + minValue;
-
+    
+    primesToFilter[0] = 2;
+    primesToFilter[1] = 3;
+    primesToFilter[2] = 5;
+    int baseToFilter = 7;
+    int baseFilter[8] = { 4, 2, 4, 2, 4, 6, 2, 6 };
+    int baseFilterOffset = 0;
+    for (int i = 3; i < maxPrimesCount; i++) {
+        primesToFilter[i] = baseToFilter;
+        baseToFilter += baseFilter[baseFilterOffset];
+        baseFilterOffset = (baseFilterOffset + 1) % 8;
+    }
 };
 
 BasePrimes::~BasePrimes() {
