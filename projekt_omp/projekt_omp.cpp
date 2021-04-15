@@ -4,15 +4,15 @@
 #include <algorithm>
 #include "BasePrimes.h"
 
-const unsigned long long MIN = 10;
-const unsigned long long MAX = 50;
+const unsigned long long MIN = 2;
+const unsigned long long MAX = 2000000000;
 unsigned char result[MAX / 8 + 1];
 
 void printResult(unsigned char* res = result) {
     unsigned int primeCount = 0;
-    for (unsigned long long i = MIN % 8, j = (MIN/8)*8; i < MAX; i++, j++) {
+    for (unsigned long long i = MIN % 8, j = i + (MIN/8)*8; i < MAX - MIN + MIN % 8; i++, j++) {
         if (!(res[i >> 3] & (0b1 << (i & 0b111)))) continue;
-        if (++primeCount > 100) continue;
+        if (++primeCount > 0) continue;
         if (primeCount % 10 == 0) printf("\n");
         printf("%" PRIu64 " ", j);
     }
@@ -21,8 +21,8 @@ void printResult(unsigned char* res = result) {
 
 int main()
 {
-    double start, stop;
-    start = omp_get_wtime();
+    //double start, stop;
+    //start = omp_get_wtime();
     //omp_set_num_threads(12);
     //basePrimes.getPrimesToCheck();
 //#pragma omp parallel for
@@ -38,16 +38,16 @@ int main()
             n = i * d;
             result[n >> 3] -= 0b1 << (n & 0b111);
         }
-        for (i = std::min((MAX / (d + 1)) / d, MIN / d - 1); i >= d; i--) {
+        for (i = std::min((MAX / (d + 1)) / d, std::max(MIN / d, (unsigned long long)d) - 1); i >= d; i--) {
             if (!(result[i >> 3] & (0b1 << (i & 0b111)))) continue;
             n = i * d;
             result[n >> 3] -= 0b1 << (n & 0b111);
         }
     }
     unsigned char* finalResult = result + MIN / 8;
-    stop = omp_get_wtime();
+    //stop = omp_get_wtime();
     printResult(finalResult);
-    printf("Czas przetwarzania wynosi %f sekund\n", stop - start);
+    //printf("Czas przetwarzania wynosi %f sekund\n", stop - start);
     return 0;
 }
 
