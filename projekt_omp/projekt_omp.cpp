@@ -1,18 +1,20 @@
 #include <omp.h>
 #include <stdio.h>
+#include <inttypes.h>
+#include <algorithm>
 #include "BasePrimes.h"
 
-const int MIN = 2;
-const int MAX = 2000000000;
-char result[MAX - MIN]{ true };
+const unsigned long long MIN = 10;
+const unsigned long long MAX = 50;
+unsigned char result[MAX / 8 + 1];
 
-void printResult(char* res = result) {
-    int primeCount = 0;
-    for (int i = 0, j = MIN; j < MAX; i++, j++) {
-        if (!res[i]) continue;
-        if (++primeCount > 0) continue;
+void printResult(unsigned char* res = result) {
+    unsigned int primeCount = 0;
+    for (unsigned long long i = MIN % 8, j = (MIN/8)*8; i < MAX; i++, j++) {
+        if (!(res[i >> 3] & (0b1 << (i & 0b111)))) continue;
+        if (++primeCount > 100) continue;
         if (primeCount % 10 == 0) printf("\n");
-        printf("%d ", j);
+        printf("%" PRIu64 " ", j);
     }
     printf("\nPrime count: %d\n", primeCount);
 }
@@ -21,15 +23,31 @@ int main()
 {
     double start, stop;
     start = omp_get_wtime();
-    BasePrimes basePrimes(MIN, MAX);
     //omp_set_num_threads(12);
     //basePrimes.getPrimesToCheck();
 //#pragma omp parallel for
-    basePrimes.getPrimesToCheck();
+    result[0] = 0b11111100;
+    unsigned int d;
+    unsigned long long i, n;
+    for (i = 1; i <= MAX / 8; i++) result[i] = 0xff;
+    unsigned int maxPrimeSqrt = sqrt(MAX);
+    for (d = 2; d <= maxPrimeSqrt; d++) {
+        if (!(result[d >> 3] & (0b1 << (d & 0b111)))) continue;
+        for (i = MAX / d; i >= std::max(MIN / d, (unsigned long long)d); i--) {
+            if (!(result[i >> 3] & (0b1 << (i & 0b111)))) continue;
+            n = i * d;
+            result[n >> 3] -= 0b1 << (n & 0b111);
+        }
+        for (i = std::min((MAX / (d + 1)) / d, MIN / d - 1); i >= d; i--) {
+            if (!(result[i >> 3] & (0b1 << (i & 0b111)))) continue;
+            n = i * d;
+            result[n >> 3] -= 0b1 << (n & 0b111);
+        }
+    }
+    unsigned char* finalResult = result + MIN / 8;
     stop = omp_get_wtime();
-    printResult(basePrimes.get());
+    printResult(finalResult);
     printf("Czas przetwarzania wynosi %f sekund\n", stop - start);
-    //printResult();
     return 0;
 }
 
