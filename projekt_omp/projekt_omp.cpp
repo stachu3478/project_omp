@@ -5,7 +5,7 @@
 #include "BasePrimes.h"
 
 const int MIN = 2;
-const int MAX = 200000000;
+const int MAX = 50000000;
 unsigned char result[MAX / 8 + 1];
 
 void printResult(unsigned char* res = result) {
@@ -21,36 +21,33 @@ void printResult(unsigned char* res = result) {
 
 int main()
 {
-    //double start, stop;
-    //start = omp_get_wtime();
-    omp_set_num_threads(1);
+    double start, stop;
+    start = omp_get_wtime();
+    omp_set_num_threads(12);
     result[0] = 0b00000011;
-    int d;
+    for (int i = 1; i <= MAX / 8; i++) result[i] = 0;
     int i, n;
-    for (i = 1; i <= MAX / 8; i++) result[i] = 0;
     unsigned int maxPrimeSqrt = sqrt(MAX);
+#pragma omp parallel for private(i, n)
     for (int d = 2; d <= maxPrimeSqrt; d++) {
         if (result[d >> 3] & (0b1 << (d & 0b111))) continue;
-#pragma omp parallel
-        {
-#pragma omp for nowait
-            for (i = MAX / d; i >= std::max(MIN / d, d); i--) {
-                if (result[i >> 3] & (0b1 << (i & 0b111))) continue;
-                n = i * d;
-                result[n >> 3] |= 0b1 << (n & 0b111);
-            }
-    #pragma omp for
-            for (i = std::min((MAX / (d + 1)) / d, std::max(MIN / d, d) - 1); i >= d; i--) {
-                if (result[i >> 3] & (0b1 << (i & 0b111))) continue;
-                n = i * d;
-                result[n >> 3] |= 0b1 << (n & 0b111);
-            }
+        for (i = MAX / d; i >= std::max(MIN / d, d); i--) {
+            if (result[i >> 3] & (0b1 << (i & 0b111))) continue;
+            n = i * d;
+#pragma omp atomic
+            result[n >> 3] |= 0b1 << (n & 0b111);
+        }
+        for (i = std::min((MAX / (d + 1)) / d, std::max(MIN / d, d) - 1); i >= d; i--) {
+            if (result[i >> 3] & (0b1 << (i & 0b111))) continue;
+            n = i * d;
+#pragma omp atomic
+            result[n >> 3] |= 0b1 << (n & 0b111);
         }
     }
     unsigned char* finalResult = result + MIN / 8;
-    //stop = omp_get_wtime();
-    //printResult(finalResult);
-    //printf("Czas przetwarzania wynosi %f sekund\n", stop - start);
+    stop = omp_get_wtime();
+    printResult(finalResult);
+    printf("Czas przetwarzania wynosi %f sekund\n", stop - start);
     return 0;
 }
 
