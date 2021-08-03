@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <cmath>
 
-const int MIN = 2;
+const int MIN = 25000000;
 const int MAX = 50000000;
 char result[MAX - MIN];
 
@@ -13,8 +13,8 @@ void printResult() {
     int primeCount = 0;
     for (int i = 0, j = MIN; j < MAX; i++, j++) {
         if (!result[i]) continue;
-        // if (++primeCount > 100) continue;
-        if (++primeCount % 10 == 0) printf("\n");
+        if (++primeCount > 100) continue;
+        if (primeCount % 10 == 0) printf("\n");
         printf("%d ", j);
     }
     printf("\nPrime count: %d\n", primeCount);
@@ -24,12 +24,14 @@ int main()
 {
     //double start, stop;
     //start = omp_get_wtime();
-    //omp_set_num_threads(12);
-    //#pragma omp parallel for
+    omp_set_num_threads(12);
+    #pragma omp parallel for
     for (int i = 0; i < MAX - MIN; i++) {
         result[i] = true;
         int j = i + MIN;
-        for (int d = 2; d <= sqrt(j); d++) {
+        if ((j & 1) == 0 && j != 2) {
+            result[i] = false;
+        } else for (int d = 3; d <= sqrt(j); d += 2) {
             if (j % d == 0) {
                 result[i] = false;
                 break;
